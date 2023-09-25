@@ -38,8 +38,11 @@ describe("Balances", () => {
     await tx1.sign();
     await tx1.send();
 
+    const startTime = new Date().getTime();
     const block1 = await appChain.produceBlock();
-
+    const endTime = new Date().getTime();
+    console.log(`Block Production time: ${endTime - startTime} milliseconds`);
+    
     const aliceBalance = await appChain.query.runtime.Balances.balances.get(
       alice
     );
