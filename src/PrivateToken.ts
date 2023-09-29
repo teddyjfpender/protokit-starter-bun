@@ -5,7 +5,7 @@ import {
     state,
 } from "@proto-kit/module";
 import { assert, StateMap } from "@proto-kit/protocol";
-import { PublicKey } from "snarkyjs";
+import { Bool, Field, PublicKey } from "snarkyjs";
 import { UTXO } from "./dataModel/dataModel";
 import { TransactionProof } from "./provable-programs/transaction";
   
@@ -23,13 +23,12 @@ export class PrivateToken extends RuntimeModule<unknown> {
     @state() public ledger = StateMap.from<PublicKey, UTXO>(PublicKey, UTXO);
 
     @runtimeMethod()
-    public mint(utxo: UTXO) {
-        // add new utxo to the ledger -- unconstrained, anyone can mint
-        this.ledger.set(utxo.transactionPublicKey, utxo);
+    public mintMyUtxo( oneTimeAddress: PublicKey, transactionPublicKey: PublicKey, amount: Field, Token: Field, spent: Bool) {
+        this.ledger.set(transactionPublicKey, new UTXO(oneTimeAddress, transactionPublicKey, amount, Token, spent));
     }
   
     @runtimeMethod()
-    public spend(transactionProof: TransactionProof) {
+    public spendUtxo(transactionProof: TransactionProof) {
     // check if input utxos in the proof are unspent
     const inputs = transactionProof.publicInput.getInputs();
 

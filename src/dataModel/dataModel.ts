@@ -20,7 +20,7 @@ export class UTXO extends Struct({
        * @param amount - Amount of tokens in the UTXO.
        * @param Token - Token type or identifier.
        */
-      constructor(publicSpendKey: PublicKey, publicViewKey: PublicKey, amount: Field, Token: Field) {
+      constructor(publicSpendKey: PublicKey, publicViewKey: PublicKey, amount: Field, Token: Field, spent: Bool) {
   
         // Generate a random private key for the transaction.
         const r = Provable.witness(Scalar, () => Scalar.random());

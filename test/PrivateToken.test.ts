@@ -2,7 +2,7 @@ import "core-js";
 import "reflect-metadata";
 
 import { TestingAppChain } from "@proto-kit/sdk";
-import { Encoding, Field, Poseidon, PrivateKey, PublicKey, UInt64 } from "snarkyjs";
+import { Bool, Encoding, Field, Poseidon, PrivateKey, PublicKey, UInt64 } from "snarkyjs";
 import { PrivateToken } from "../src/PrivateToken";
 import { describe, expect, it, beforeEach } from "bun:test";
 import { KeyPairs, deriveKeyPairs } from "../src/keyDerivation";
@@ -46,12 +46,13 @@ describe("Balances", () => {
     // this is almost equivalent to obtaining the contract ABI in solidity
     const ledger = appChain.runtime.resolve("PrivateToken");
     // create UTxO
-    const utxo = new UTXO(PublicKey.fromBase58(keyPairsSender.S), PublicKey.fromBase58(keyPairsSender.V), Field(100), token);
-
+    const utxo = new UTXO(PublicKey.fromBase58(keyPairsSender.S), PublicKey.fromBase58(keyPairsSender.V), Field(100), token, Bool(false));
+    console.log("constructing transaction");
     const tx1 = appChain.transaction(alice, () => {
-      ledger.mint(utxo);
+      ledger.mintMyUtxo(PublicKey.fromBase58(keyPairsSender.S), PublicKey.fromBase58(keyPairsSender.V), Field(100), token, Bool(false));
     });
-
+    console.log("signing transaction");
+    
     await tx1.sign();
     await tx1.send();
 
@@ -66,6 +67,5 @@ describe("Balances", () => {
 
     expect(block1?.txs[0].status, block1?.txs[0].statusMessage).toBe(true);
     expect(UTXO.toJSON(aliceUTxO!)).toBeDefined();
-
   });
 });
